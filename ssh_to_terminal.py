@@ -22,7 +22,7 @@ except Exception:  # pragma: no cover
 
 __author__ = "Matt Lowe"
 __email__ = "marl.scot.1@googlemail.com"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __license__ = "MIT"
 
 
@@ -200,7 +200,7 @@ def upsert_profiles(profiles: List[Dict], ssh_hosts: List[SshHost], source_tag: 
         profile = {
             "name": host.name,
             "commandline": host.commandline,
-            "guid": host.guid(),
+            "guid": f"{{{host.guid()}}}",
             "hidden": False,
             "source": source_tag,
         }

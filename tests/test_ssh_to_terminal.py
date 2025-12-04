@@ -122,8 +122,8 @@ def test_upsert_profiles_into_example(tmp_path: Path):
 
     p2 = next(p for p in profiles if p["name"] == "Server01")
     assert p2["commandline"] == "ssh -p 2222 -i /home/alice/.ssh/id_rsa alice@1.2.3.4"
-    # GUIDs should be deterministic for given name
-    assert p2["guid"] == stt.SshHost(name="Server01").guid()
+    # GUIDs should be deterministic for given name and enclosed in braces
+    assert p2["guid"] == f"{{{stt.SshHost(name='Server01').guid()}}}"
 
 
 def test_remove_profiles_by_names(tmp_path: Path):
