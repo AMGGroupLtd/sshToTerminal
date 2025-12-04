@@ -202,7 +202,7 @@ def upsert_profiles(profiles: List[Dict], ssh_hosts: List[SshHost], source_tag: 
             "commandline": host.commandline,
             "guid": f"{{{host.guid()}}}",
             "hidden": False,
-            "source": source_tag,
+            # intentionally omitting 'source' to comply with Windows Terminal auto-generated profile rules
         }
         if host.name in by_name:
             profiles[by_name[host.name]] = profile
@@ -214,11 +214,26 @@ def remove_profiles(profiles: List[Dict], ssh_hosts: List[SshHost], source_tag: 
     names = {h.name for h in ssh_hosts}
     keep: List[Dict] = []
     for p in profiles:
-        n = p.get("name") if isinstance(p, dict) else None
-        src = p.get("source") if isinstance(p, dict) else None
-        if n in names or (not names and src == source_tag):
-            # drop it
+        if not isinstance(p, dict):
+            keep.append(p)
             continue
+        n = p.get("name")
+        if n in names:
+            # drop profiles that match names from provided ssh_hosts
+            continue
+        if not names:
+            # When no specific names provided, remove profiles that look like ours.
+            # Detection heuristic: deterministic GUID derived from profile name using our namespace.
+            g = p.get("guid")
+            if isinstance(n, str) and isinstance(g, str):
+                try:
+                    expected = f"{{{SshHost(name=n).guid()}}}"
+                    if g == expected:
+                        # looks like a profile created by this tool; drop it
+                        continue
+                except Exception:
+                    pass
+        # otherwise, keep
         keep.append(p)
     profiles[:] = keep
 

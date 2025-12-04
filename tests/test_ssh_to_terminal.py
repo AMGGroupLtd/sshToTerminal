@@ -140,8 +140,6 @@ def test_remove_profiles_by_names(tmp_path: Path):
     stt.remove_profiles(profiles, [h1])
     assert {p["name"] for p in profiles} == {"B"}
 
-    # remove remaining via empty names but with source tag
-    # mark current B as created by our tool
-    profiles[0]["source"] = "sshToTerminal"
-    stt.remove_profiles(profiles, [], source_tag="sshToTerminal")
+    # remove remaining via empty names: should remove any profiles created by this tool
+    stt.remove_profiles(profiles, [])
     assert profiles == []
