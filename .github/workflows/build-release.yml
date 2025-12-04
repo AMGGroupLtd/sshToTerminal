@@ -1,10 +1,15 @@
-name: Build and Release ssh2terminal
+name: Build and Release ${{ env.APP_NAME }}
 
 on:
   push:
     tags:
       - '*'
   workflow_dispatch:
+
+env:
+  APP_NAME: ssh2terminal
+  ENTRYPOINT: ssh_to_terminal.py
+  PY_VERSION: '3.12'
 
 permissions:
   contents: write
@@ -30,7 +35,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PY_VERSION }}
 
       - name: Install build dependencies
         shell: bash
@@ -44,7 +49,7 @@ jobs:
       - name: Build single-file binary with PyInstaller
         shell: bash
         run: |
-          pyinstaller --onefile --name ssh2terminal ssh_to_terminal.py
+          pyinstaller --onefile --name "$APP_NAME" "$ENTRYPOINT"
 
       - name: Compute metadata (version, platform)
         id: meta
@@ -71,18 +76,18 @@ jobs:
         shell: bash
         run: |
           mkdir -p release
-          BIN="dist/dcj${{ matrix.ext }}"
+          BIN="dist/${APP_NAME}${{ matrix.ext }}"
           if [[ ! -f "$BIN" ]]; then
             echo "Build output not found: $BIN" >&2
             exit 1
           fi
-          OUT_NAME="dcj-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.platform }}${{ matrix.ext }}"
+          OUT_NAME="${APP_NAME}-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.platform }}${{ matrix.ext }}"
           cp "$BIN" "release/$OUT_NAME"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dcj-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.platform }}
+          name: ${{ env.APP_NAME }}-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.platform }}
           path: release/*
           if-no-files-found: error
 
