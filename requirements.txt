@@ -1,0 +1,6 @@
+# Runtime dependencies
+requests>=2.25
+jsonschema>=4.0
+
+# Test dependencies
+pytest>=7.0
