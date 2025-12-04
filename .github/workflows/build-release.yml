@@ -1,4 +1,4 @@
-name: Build and Release ${{ env.APP_NAME }}
+name: Build and Release
 
 on:
   push:

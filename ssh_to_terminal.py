@@ -22,7 +22,7 @@ except Exception:  # pragma: no cover
 
 __author__ = "Matt Lowe"
 __email__ = "marl.scot.1@googlemail.com"
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __license__ = "MIT"
 
 
